@@ -1,4 +1,3 @@
-
 #include "include/syclfft.h"
 
 
@@ -15,6 +14,7 @@ namespace Devicespec {
     bool cpu_device;
 }
 
+class fft_kernal;
 
 void sycl_fft_setup() {
     sycl::device device = sycl::default_selector{}.select_device();
@@ -32,5 +32,89 @@ void sycl_fft_setup() {
 }
 
 void rs_parrallel(vector<float>& data, vecotr<float>& real, veector<float>& complex) {
+    //this stage of development assumes that data does not exceed max number of work items
+    real.resize(data.size());
+    complex.resize(data.size());
     
+    vector<float> temp_real(2*data.size());
+    vector<float> temp_complex(2*data.size());
+
+    size_t stages = 0;
+    size_t length = data.size();
+    size_t length2 = 2*length;
+
+    while (length != 0) {
+        length >>= 1;
+        stages++; 
+    } 
+    cout << stages << endl;
+
+
+    sycl::device device = sycl::default_selector{}.select_device();
+
+    sycl::queue queue(device, [] (sycl::exception_list el) {
+       for (auto ex : el) { std::rethrow_exception(ex); }
+    } );
+    
+
+
+    {
+        sycl::buffer<float, 1> buff_data(data.data(), sycl::rang<1>(data.size()));
+        sycl::buffer<float, 1> buff_real(temp_real.data(), sycl::rang<1>(temp_real.size()));
+        sycl::buffer<float, 1> buff_complex(temp_complex.data(), sycl::rang<1>(temp_complex.size()));
+
+        queue.submit([&] (sycl::handler& cgh) {
+            auto data_acc = buff_data.get_access<sycl::access::mode::read>(cgh); //read only input data
+            auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
+            auto complex_acc = buff_comlex.get_access<sycl::access::mode::read_write>(cgh);
+
+            //now is the hard part, the parallel sycl algorithm
+            cgh.parallel_for<class fft_kernal>(
+                sycl::range<1>(length2), [=] (id<1> i) {
+                    int temp_index = bitReverse(i);
+                    real_acc[i] = 0;
+                    complex_acc[i] = 0;
+                    if (i < length) real_acc[i] = data_acc[temp_index];
+                }
+            );
+        });
+        queue.wait_and_throw();
+
+
+        for (int i = 1; i < stages; i++) {
+            queue.submit([&] (sycl::handler& cgh) {
+                auto real_acc = buff_real.get_access<sycl::access::mode::write>(cgh);
+                auto complex_acc = buff_comlex.get_access<sycl::access::mode::write>(cgh);
+
+                //now is the hard part, the parallel sycl algorithm
+                cgh.parallel_for<class fft_kernal>(
+                    sycl::range<1>(length2), [=] (id<1> j) {
+                        int interval = 2;
+                        interval <<= i;
+
+                        int offset_read = i%2 ? 0 : length;
+                        int offset_write = i%2 ? length : 0; 
+
+                        if ((j/(interval >> 1))%2 == 0) {
+                            float t_real = 0;
+                            float t_complex = 0;
+                            int power = (j%inerval) * (length/interval);
+                            w_calculator(length, power, t_real, t_complex);
+                            real_acc[j + offset_read] = real_acc[j + offset_write] + t_real*real_acc[j + offset_write + (interval >> 1)];
+                            complex_acc[j + offset_read] = complex_acc[j + offset_write] + t_complex*complex_acc[j + offset_write + (interval >> 1)];
+                        }
+                        else {
+                            float t_real = 0;
+                            float t_complex = 0;
+                            int power = (j%inerval) * (length/interval);
+                            w_calculator(length, power, t_real, t_complex);
+                            real_acc[j + offset_read] = t_real*real_acc[j + offset_write] + real_acc[j + offset_write - (interval >> 1)];
+                            complex_acc[j + offset_read] = t_complex*complex_acc[j + offset_write] + complex_acc[j + offset_write - (interval >> 1)];
+                        }
+                    }
+                );
+            });//needs to copy back to results!!!
+            queue.wait_and_throw();
+        }
+    }
 }
