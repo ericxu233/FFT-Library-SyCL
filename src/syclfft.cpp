@@ -130,7 +130,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
             auto comp_wr = buff_comp_wr.get_access<sycl::access::mode::write>(cgh);
 
             cgh.parallel_for<class finish_kernal>(
-                sycl::range<1>(length2), [=] (id<1> j) {
+                sycl::range<1>(length2), [=] (sycl::id<1> j) {
                     if (stages%2 == 0) {
                         real_wr[j] = real_acc[j];
                         comp_wr[j] = complex_acc[j];
