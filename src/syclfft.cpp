@@ -112,7 +112,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                         else {
                             float t_real = 0;
                             float t_complex = 0;
-                            int power = (j%inerval) * (length/interval);
+                            int power = (j%interval) * (length/interval);
                             w_calculator(length, power, t_real, t_complex);
                             real_acc[j + offset_read] = t_real*real_acc[j + offset_write] + real_acc[j + offset_write - (interval >> 1)];
                             complex_acc[j + offset_read] = t_complex*complex_acc[j + offset_write] + complex_acc[j + offset_write - (interval >> 1)];
@@ -124,7 +124,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
         }
         queue.submit([&] (sycl::handler& cgh) {
             auto real_acc = buff_real.get_access<sycl::access::mode::read>(cgh);
-            auto complex_acc = buff_comlex.get_access<sycl::access::mode::read>(cgh);
+            auto complex_acc = buff_complex.get_access<sycl::access::mode::read>(cgh);
 
             auto real_wr = buff_real_wr.get_access<sycl::access::mode::write>(cgh);
             auto comp_wr = buff_comp_wr.get_access<sycl::access::mode::write>(cgh);
