@@ -15,6 +15,8 @@ namespace Devicespec {
 }
 
 class fft_kernal;
+class setup_kernal;
+class finish_kernal;
 
 void sycl_fft_setup() {
     sycl::device device = sycl::default_selector{}.select_device();
@@ -63,13 +65,16 @@ void rs_parrallel(vector<float>& data, vecotr<float>& real, veector<float>& comp
         sycl::buffer<float, 1> buff_real(temp_real.data(), sycl::rang<1>(temp_real.size()));
         sycl::buffer<float, 1> buff_complex(temp_complex.data(), sycl::rang<1>(temp_complex.size()));
 
+        sycl::buffer<float, 1> buff_real_wr(real.data(), sycl::rang<1>(real.size()));
+        sycl::buffer<float, 1> buff_comp_wr(complex.data(), sycl::rang<1>(complex.size()));
+
         queue.submit([&] (sycl::handler& cgh) {
             auto data_acc = buff_data.get_access<sycl::access::mode::read>(cgh); //read only input data
             auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
             auto complex_acc = buff_comlex.get_access<sycl::access::mode::read_write>(cgh);
 
             //now is the hard part, the parallel sycl algorithm
-            cgh.parallel_for<class fft_kernal>(
+            cgh.parallel_for<class setup_kernal>(
                 sycl::range<1>(length2), [=] (id<1> i) {
                     int temp_index = bitReverse(i);
                     real_acc[i] = 0;
@@ -83,12 +88,12 @@ void rs_parrallel(vector<float>& data, vecotr<float>& real, veector<float>& comp
 
         for (int i = 1; i < stages; i++) {
             queue.submit([&] (sycl::handler& cgh) {
-                auto real_acc = buff_real.get_access<sycl::access::mode::write>(cgh);
-                auto complex_acc = buff_comlex.get_access<sycl::access::mode::write>(cgh);
+                auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
+                auto complex_acc = buff_comlex.get_access<sycl::access::mode::read_write>(cgh);
 
                 //now is the hard part, the parallel sycl algorithm
                 cgh.parallel_for<class fft_kernal>(
-                    sycl::range<1>(length2), [=] (id<1> j) {
+                    sycl::range<1>(length), [=] (id<1> j) {
                         int interval = 2;
                         interval <<= i;
 
@@ -116,5 +121,25 @@ void rs_parrallel(vector<float>& data, vecotr<float>& real, veector<float>& comp
             });//needs to copy back to results!!!
             queue.wait_and_throw();
         }
+        queue.submit([&] (sycl::handler& cgh) {
+            auto real_acc = buff_real.get_access<sycl::access::mode::read>(cgh);
+            auto complex_acc = buff_comlex.get_access<sycl::access::mode::read>(cgh);
+
+            auto real_wr = buff_real_wr.get_access<sycl::access::mode::write>(cgh);
+            auto comp_wr = buff_comp_wr.get_access<sycl::access::mode::write>(cgh);
+
+            cgh.parallel_for<class finish_kernal>(
+                sycl::range<1>(length2), [=] (id<1> j) {
+                    if (stages%2 == 0) {
+                        real_wr[j] = real_acc[j];
+                        comp_wr[j] = complex_acc[j];
+                    }
+                    else {
+                        real_wr[j] = real_acc[j + length];
+                        comp_wr[j] = complex_acc[j + length];
+                    }
+                }
+            );
+        });
     }
 }
