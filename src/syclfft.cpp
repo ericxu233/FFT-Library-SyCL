@@ -1,4 +1,5 @@
 #include "include/syclfft.h"
+#include "compute_utility.h"
 
 
 namespace Devicespec {
@@ -29,11 +30,11 @@ void sycl_fft_setup() {
     Devicespec::dim1 = max_work_item[2];
 
 
-    if (Devicespec::work_group_size == 1) cpu_device = true;
-    else cpu_device = false;
+    if (Devicespec::work_group_size == 1) Devicespec::cpu_device = true;
+    else Devicespec::cpu_device = false;
 }
 
-void rs_parrallel(vector<float>& data, vecotr<float>& real, veector<float>& complex) {
+void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& complex) {
     //this stage of development assumes that data does not exceed max number of work items
     real.resize(data.size());
     complex.resize(data.size());
@@ -61,21 +62,21 @@ void rs_parrallel(vector<float>& data, vecotr<float>& real, veector<float>& comp
 
 
     {
-        sycl::buffer<float, 1> buff_data(data.data(), sycl::rang<1>(data.size()));
-        sycl::buffer<float, 1> buff_real(temp_real.data(), sycl::rang<1>(temp_real.size()));
-        sycl::buffer<float, 1> buff_complex(temp_complex.data(), sycl::rang<1>(temp_complex.size()));
+        sycl::buffer<float, 1> buff_data(data.data(), sycl::range<1>(data.size()));
+        sycl::buffer<float, 1> buff_real(temp_real.data(), sycl::range<1>(temp_real.size()));
+        sycl::buffer<float, 1> buff_complex(temp_complex.data(), sycl::range<1>(temp_complex.size()));
 
-        sycl::buffer<float, 1> buff_real_wr(real.data(), sycl::rang<1>(real.size()));
-        sycl::buffer<float, 1> buff_comp_wr(complex.data(), sycl::rang<1>(complex.size()));
+        sycl::buffer<float, 1> buff_real_wr(real.data(), sycl::range<1>(real.size()));
+        sycl::buffer<float, 1> buff_comp_wr(complex.data(), sycl::range<1>(complex.size()));
 
         queue.submit([&] (sycl::handler& cgh) {
             auto data_acc = buff_data.get_access<sycl::access::mode::read>(cgh); //read only input data
             auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
-            auto complex_acc = buff_comlex.get_access<sycl::access::mode::read_write>(cgh);
+            auto complex_acc = buff_complex.get_access<sycl::access::mode::read_write>(cgh);
 
             //now is the hard part, the parallel sycl algorithm
             cgh.parallel_for<class setup_kernal>(
-                sycl::range<1>(length2), [=] (id<1> i) {
+                sycl::range<1>(length2), [=] (sycl::id<1> i) {
                     int temp_index = bitReverse(i);
                     real_acc[i] = 0;
                     complex_acc[i] = 0;
@@ -89,11 +90,11 @@ void rs_parrallel(vector<float>& data, vecotr<float>& real, veector<float>& comp
         for (int i = 1; i < stages; i++) {
             queue.submit([&] (sycl::handler& cgh) {
                 auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
-                auto complex_acc = buff_comlex.get_access<sycl::access::mode::read_write>(cgh);
+                auto complex_acc = buff_complex.get_access<sycl::access::mode::read_write>(cgh);
 
                 //now is the hard part, the parallel sycl algorithm
                 cgh.parallel_for<class fft_kernal>(
-                    sycl::range<1>(length), [=] (id<1> j) {
+                    sycl::range<1>(length), [=] (sycl::git id<1> j) {
                         int interval = 2;
                         interval <<= i;
 
@@ -103,7 +104,7 @@ void rs_parrallel(vector<float>& data, vecotr<float>& real, veector<float>& comp
                         if ((j/(interval >> 1))%2 == 0) {
                             float t_real = 0;
                             float t_complex = 0;
-                            int power = (j%inerval) * (length/interval);
+                            int power = (j%interval) * (length/interval);
                             w_calculator(length, power, t_real, t_complex);
                             real_acc[j + offset_read] = real_acc[j + offset_write] + t_real*real_acc[j + offset_write + (interval >> 1)];
                             complex_acc[j + offset_read] = complex_acc[j + offset_write] + t_complex*complex_acc[j + offset_write + (interval >> 1)];
