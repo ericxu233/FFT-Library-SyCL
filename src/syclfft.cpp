@@ -94,7 +94,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
 
                 //now is the hard part, the parallel sycl algorithm
                 cgh.parallel_for<class fft_kernal>(
-                    sycl::range<1>(length), [=] (sycl::git id<1> j) {
+                    sycl::range<1>(length), [=] (sycl::id<1> j) {
                         int interval = 2;
                         interval <<= i;
 
