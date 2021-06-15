@@ -1,0 +1,5 @@
+1. run code on research machine to complete proof of concept
+
+2. write better parallization methods
+
+3. use kernal classes, refer to Dr. Fong's git hub on this
