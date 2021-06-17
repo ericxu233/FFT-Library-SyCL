@@ -52,6 +52,8 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
     } 
     cout << stages << endl;
 
+    cout << "work groups are " << Devicespec::work_group_size << ", items in work groups are " << Devicespec::dim1 << endl;
+
 
     sycl::device device = sycl::default_selector{}.select_device();
 
@@ -59,7 +61,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
        for (auto ex : el) { std::rethrow_exception(ex); }
     } );
     
-
+    cout << "sycl exception setup is working" << endl;
 
     {
         sycl::buffer<float, 1> buff_data(data.data(), sycl::range<1>(data.size()));
@@ -86,6 +88,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
         });
         queue.wait_and_throw();
 
+        cout << "copy data is set up" << endl;
 
         for (int i = 1; i < stages; i++) {
             queue.submit([&] (sycl::handler& cgh) {
