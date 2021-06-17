@@ -46,8 +46,8 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
     size_t length = data.size();
     size_t length2 = 2*length;
 
-    while (length != 0) {
-        length >>= 1;
+    while (length != 1) {
+        length /= 2;
         stages++; 
     } 
     cout << stages << endl;
