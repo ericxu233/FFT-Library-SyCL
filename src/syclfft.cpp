@@ -80,8 +80,8 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
             cgh.parallel_for<class setup_kernal>(
                 sycl::range<1>(length2), [=] (sycl::id<1> i) {
                     int temp_index = bitReverse(i);
-                    real_acc[i] = 0;
-                    complex_acc[i] = 0;
+                    real_acc[i] = 1;
+                    complex_acc[i] = 1.2;
                     if (i < length) real_acc[i] = data_acc[temp_index];
                 }
             );
