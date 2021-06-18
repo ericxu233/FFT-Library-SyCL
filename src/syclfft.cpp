@@ -113,13 +113,13 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                             offset_read = length;
                             offset_write = 0;
                         }
-                        /*
+                        
                         int tt_f = (j/(interval >> 1))%2;
                         if (tt_f == 0) {
                             float t_real = 0;
                             float t_complex = 0;
                             int power = (j%interval) * (length/interval);
-                            w_calculator(length, power, t_real, t_complex);
+                            //w_calculator(length, power, t_real, t_complex);
                             real_acc[j + offset_read] = real_acc[j + offset_write] + t_real*real_acc[j + offset_write + (interval >> 1)];
                             complex_acc[j + offset_read] = complex_acc[j + offset_write] + t_complex*complex_acc[j + offset_write + (interval >> 1)];
                         }
@@ -127,11 +127,11 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                             float t_real = 0;
                             float t_complex = 0;
                             int power = (j%interval) * (length/interval);
-                            w_calculator(length, power, t_real, t_complex);
+                            //w_calculator(length, power, t_real, t_complex);
                             real_acc[j + offset_read] = t_real*real_acc[j + offset_write] + real_acc[j + offset_write - (interval >> 1)];
                             complex_acc[j + offset_read] = t_complex*complex_acc[j + offset_write] + complex_acc[j + offset_write - (interval >> 1)];
                         }
-                        */
+                        
                     }
                 );
             });//needs to copy back to results!!!
