@@ -31,6 +31,6 @@ inline void w_calculator(int base, int power, float& real, float& complex) {
         complex = 0;
         return;
     }
-    real = cosf(-2.0*PI*power/base);
-    complex = sinf(-2.0*PI*power/base);
+    //real = cosf(-2.0*PI*power/base);
+    //complex = sinf(-2.0*PI*power/base);
 }
