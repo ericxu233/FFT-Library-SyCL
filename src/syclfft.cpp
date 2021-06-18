@@ -114,7 +114,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                             offset_write = 0;
                         }
                         int tt_f = (j/(interval >> 1))%2;
-                        if ((tt_f == 0) {
+                        if (tt_f == 0) {
                             float t_real = 0;
                             float t_complex = 0;
                             int power = (j%interval) * (length/interval);
