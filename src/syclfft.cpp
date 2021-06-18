@@ -80,8 +80,8 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
             cgh.parallel_for<class setup_kernal>(
                 sycl::range<1>(length2), [=] (sycl::id<1> i) {
                     int temp_index = bitReverse(i);
-                    real_acc[i] = 1;
-                    complex_acc[i] = 1.2;
+                    real_acc[i] = 0;
+                    complex_acc[i] = 0;
                     if (i < length) real_acc[i] = data_acc[temp_index];
                 }
             );
@@ -89,7 +89,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
         queue.wait_and_throw();
 
         cout << "copy data is set up" << endl;
-        /*
+        
         for (int i = 1; i < stages; i++) {
             queue.submit([&] (sycl::handler& cgh) {
                 auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
@@ -97,13 +97,22 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
 
                 //now is the hard part, the parallel sycl algorithm
                 cgh.parallel_for<class fft_kernal>(
-                    sycl::range<1>(length), [=] (sycl::id<1> j1) {
+                    sycl::range<1>(length), [=] (sycl::id<1> j) {
 
                         int interval = 2;
                         interval <<= i;
+                        
+                        int offset_read = 0;
+                        int offset_write = 0;
 
-                        int offset_read = i%2 ? 0 : length;
-                        int offset_write = i%2 ? length : 0; 
+                        if (i%2 == 0) {
+                            offset_read = 0;
+                            offset_write = length;
+                        }
+                        else {
+                            offset_read = length;
+                            offset_write = 0;
+                        }
 
                         if ((j/(interval >> 1))%2 == 0) {
                             float t_real = 0;
@@ -126,7 +135,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
             });//needs to copy back to results!!!
             queue.wait_and_throw();
         }
-        */
+        
         queue.submit([&] (sycl::handler& cgh) {
             auto real_acc = buff_real.get_access<sycl::access::mode::read>(cgh);
             auto complex_acc = buff_complex.get_access<sycl::access::mode::read>(cgh);
