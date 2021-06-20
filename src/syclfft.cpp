@@ -84,12 +84,12 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
             //now is the hard part, the parallel sycl algorithm
             cgh.parallel_for<class setup_kernal>(
                 sycl::range<1>(length), [=] (sycl::id<1> i) {
-                    int temp_index = bitReverse(i, stages);
+                    size_t temp_index = bitReverse(i, stages);
                     real_acc[i] = 0;
                     real_acc[i + length] = 0;
                     complex_acc[i] = 0;
                     complex_acc[i + length] = 0;
-                    if (i < length) real_acc[i] = data_acc[temp_index];
+                    real_acc[i] = data_acc[temp_index];
                 }
             );
         });
@@ -105,7 +105,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
 
         cout << "copy data is set up" << endl;
         
-        for (int i = 1; i < stages; i++) {
+        for (size_t i = 1; i < stages; i++) {
             queue.submit([&] (sycl::handler& cgh) {
                 auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
                 auto complex_acc = buff_complex.get_access<sycl::access::mode::read_write>(cgh);
@@ -153,6 +153,8 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
             queue.wait_and_throw();
         }
         
+        cout << "core parallelism is done" << endl;
+
         queue.submit([&] (sycl::handler& cgh) {
             auto real_acc = buff_real.get_access<sycl::access::mode::read>(cgh);
             auto complex_acc = buff_complex.get_access<sycl::access::mode::read>(cgh);
