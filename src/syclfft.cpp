@@ -88,8 +88,8 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
         });
         queue.wait_and_throw();
 
-        auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
-        auto complex_acc = buff_complex.get_access<sycl::access::mode::read_write>(cgh);
+        auto real_acc = buff_real.get_access<sycl::access::mode::read_write>();
+        auto complex_acc = buff_complex.get_access<sycl::access::mode::read_write>();
 
         for (int i = 0; i < 8; i++) {
             cout << "( " << real_acc[i] << " , " << complex_acc[i] << " )" << endl;
