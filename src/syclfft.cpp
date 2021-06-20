@@ -63,6 +63,10 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
     
     cout << "sycl exception setup is working" << endl;
 
+    for (size_t i = 0; i < 8; i++) {
+        cout << bitReverse(i) << endl;
+    }
+
     {
         sycl::buffer<float, 1> buff_data(data.data(), sycl::range<1>(data.size()));
         sycl::buffer<float, 1> buff_real(temp_real.data(), sycl::range<1>(temp_real.size()));
@@ -90,10 +94,11 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
 
         auto real_acc = buff_real.get_access<sycl::access::mode::read_write>();
         auto complex_acc = buff_complex.get_access<sycl::access::mode::read_write>();
-
+        /*
         for (int i = 0; i < 8; i++) {
             cout << "( " << real_acc[i] << " , " << complex_acc[i] << " )" << endl;
         }
+        */
 
         cout << "copy data is set up" << endl;
         
