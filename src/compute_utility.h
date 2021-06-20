@@ -1,5 +1,5 @@
 #pragma once
-
+#include "include/syclfft.h"
 #include <cmath>
 #define PI 3.1415926
 
@@ -31,6 +31,9 @@ inline void w_calculator(int base, int power, float& real, float& complex) {
         complex = 0;
         return;
     }
-    //real = cosf(-2.0*PI*power/base);
-    //complex = sinf(-2.0*PI*power/base);
+
+    real = sycl::cos(-2.0*PI*power/base);
+    complex = sycl::sin(-2.0*PI*power/base);
+
+    // lol this code does not work in GPU...weird
 }
