@@ -9,15 +9,17 @@
     - fast e power
 */
 
-inline unsigned int bitReverse(unsigned int x) {
+inline unsigned int bitReverse(unsigned int x, unsigned int length) {
 
     unsigned int rev = 0;
      
     // traversing bits of 'n' from the right
-    while (x > 0) {
+    int counter = length;
+    while (counter > 0) {
         rev <<= 1;
         rev |= (x & 1);
         x >>= 1;
+        counter--;
     }
     /* note: this function really needs testing */
     return rev;

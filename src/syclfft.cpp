@@ -55,6 +55,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
     cout << "work groups are " << Devicespec::work_group_size << ", items in work groups are " << Devicespec::dim1 << endl;
 
 
+
     sycl::device device = sycl::default_selector{}.select_device();
 
     sycl::queue queue(device, [] (sycl::exception_list el) {
@@ -64,7 +65,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
     cout << "sycl exception setup is working" << endl;
 
     for (size_t i = 0; i < 8; i++) {
-        cout << bitReverse(i) << endl;
+        cout << bitReverse(i, stages) << endl;
     }
 
     {
@@ -83,7 +84,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
             //now is the hard part, the parallel sycl algorithm
             cgh.parallel_for<class setup_kernal>(
                 sycl::range<1>(length2), [=] (sycl::id<1> i) {
-                    int temp_index = bitReverse(i);
+                    int temp_index = bitReverse(i, stages);
                     real_acc[i] = 0;
                     complex_acc[i] = 0;
                     if (i < length) real_acc[i] = data_acc[temp_index];
