@@ -86,9 +86,9 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                 sycl::range<1>(length), [=] (sycl::id<1> i) {
                     int temp_index = bitReverse(i, stages);
                     real_acc[i] = 0;
-                    real_acc[i + lenght] = 0;
+                    real_acc[i + length] = 0;
                     complex_acc[i] = 0;
-                    omplex_acc[i + lenght] = 0;
+                    omplex_acc[i + length] = 0;
                     if (i < length) real_acc[i] = data_acc[temp_index];
                 }
             );
