@@ -95,11 +95,11 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
 
         auto real_acc = buff_real.get_access<sycl::access::mode::read_write>();
         auto complex_acc = buff_complex.get_access<sycl::access::mode::read_write>();
-        /*
+        
         for (int i = 0; i < 8; i++) {
             cout << "( " << real_acc[i] << " , " << complex_acc[i] << " )" << endl;
         }
-        */
+        
 
         cout << "copy data is set up" << endl;
         
@@ -112,7 +112,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                 cgh.parallel_for<class fft_kernal>(
                     sycl::range<1>(length), [=] (sycl::id<1> j) {
 
-                        int interval = 2;
+                        int interval = 1;
                         interval <<= i;
                         
                         int offset_read = 0;
