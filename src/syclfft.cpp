@@ -83,10 +83,12 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
 
             //now is the hard part, the parallel sycl algorithm
             cgh.parallel_for<class setup_kernal>(
-                sycl::range<1>(length2), [=] (sycl::id<1> i) {
+                sycl::range<1>(length), [=] (sycl::id<1> i) {
                     int temp_index = bitReverse(i, stages);
                     real_acc[i] = 0;
+                    real_acc[i + lenght] = 0;
                     complex_acc[i] = 0;
+                    omplex_acc[i + lenght] = 0;
                     if (i < length) real_acc[i] = data_acc[temp_index];
                 }
             );
