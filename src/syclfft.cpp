@@ -76,6 +76,13 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
         sycl::buffer<float, 1> buff_real_wr(real.data(), sycl::range<1>(real.size()));
         sycl::buffer<float, 1> buff_comp_wr(complex.data(), sycl::range<1>(complex.size()));
 
+        {
+            auto data_acc = buff_data.get_access<sycl::access::mode::read>(cgh);
+            for (int i = 0; i < 16; i++) {
+                cout << "( " << data_acc[i] << " )" << endl;
+            }
+        }
+
         queue.submit([&] (sycl::handler& cgh) {
             auto data_acc = buff_data.get_access<sycl::access::mode::read>(cgh); //read only input data
             auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
