@@ -68,7 +68,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
     
     cout << "sycl exception setup is working" << endl;
 
-    for (size_t i = 0; i < 8; i++) {
+    for (size_t i = 0; i < length; i++) {
         cout << bitReverse(i, stages) << endl;
     }
 
@@ -110,12 +110,12 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
         queue.wait_and_throw();
 
         {
-        auto real_acc = buff_real.get_access<sycl::access::mode::read_write>();
-        auto complex_acc = buff_complex.get_access<sycl::access::mode::read_write>();
+            auto real_acc = buff_real.get_access<sycl::access::mode::read_write>();
+            auto complex_acc = buff_complex.get_access<sycl::access::mode::read_write>();
         
-        for (int i = 0; i < 16; i++) {
-            cout << "( " << real_acc[i] << " , " << complex_acc[i] << " )" << endl;
-        }
+            for (int i = 0; i < length*2; i++) {
+                cout << "( " << real_acc[i] << " , " << complex_acc[i] << " )" << endl;
+            }
         }
         
 
@@ -180,7 +180,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
             auto comp_wr = buff_comp_wr.get_access<sycl::access::mode::write>(cgh);
 
             cgh.parallel_for<class finish_kernal>(
-                sycl::range<1>(length2), [=] (sycl::id<1> j) {
+                sycl::range<1>(length), [=] (sycl::id<1> j) {
                     if (stages%2 == 0) {
                         real_wr[j] = real_acc[j];
                         comp_wr[j] = complex_acc[j];

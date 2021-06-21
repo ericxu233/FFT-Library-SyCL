@@ -37,5 +37,4 @@ inline void w_calculator(int base, int power, float& real, float& complex) {
     real = sycl::cos(-2.0*PI*power/base);
     complex = sycl::sin(-2.0*PI*power/base);
 
-    // lol this code does not work in GPU...weird
 }
