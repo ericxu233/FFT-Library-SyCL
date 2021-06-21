@@ -38,3 +38,13 @@ inline void w_calculator(int base, int power, float& real, float& complex) {
     complex = sycl::sin(-2.0*PI*power/base);
 
 }
+
+
+inline void complex_calculator(float target_real, float target_complex, float& result_real, float& result_complex) {
+    result_real = target_real*result_real + -1*(result_complex*target_complex);
+    result_complex = target_real*result_complex + target_complex*result_real;
+    //-0.5403 + 0.84147i
+    //
+
+    //0.4794 + 0.87758i
+}
