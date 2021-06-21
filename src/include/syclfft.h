@@ -14,5 +14,9 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
 void rs_sequencial(vector<float>& data, vector<float>& real, vector<float>& complex);
 
 
+
+//
+void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& complex);
+
 //
 void fft_optimized_parallel(vector<float>& data, vector<float>& real, vector<float>& complex);

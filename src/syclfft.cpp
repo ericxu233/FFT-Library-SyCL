@@ -19,6 +19,8 @@ class fft_kernal;
 class setup_kernal;
 class finish_kernal;
 
+class single_workgroup; 
+
 void sycl_fft_setup() {
     sycl::device device = sycl::default_selector{}.select_device();
 
@@ -196,4 +198,118 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
             );
         });
     }
+}
+
+void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& imag) {
+    const size_t fft_length = data.size();
+    
+    size_t tempp = fft_length;
+
+    size_t stages = 0;
+
+    while (tempp != 1) {
+        tempp /= 2;
+        stages++; 
+    }
+
+    real.resize(data.size());
+    complex.resize(data.size());
+
+    sycl::device device = sycl::default_selector{}.select_device();
+    
+    //sycl::queue queue(sycl::default_selector{});
+
+    
+    sycl::queue queue(device, [] (sycl::exception_list el) {
+       for (auto ex : el) { std::rethrow_exception(ex); }
+    });
+
+
+
+    {
+        sycl::buffer<float, 1> buff_data(data.data(), sycl::range<1>(data.size()));
+        sycl::buffer<float, 1> buff_real(real.data(), sycl::range<1>(data.size()));
+        sycl::buffer<float, 1> buff_imag(image.data(), sycl::range<1>(data.size()));
+
+        queue.submit([&] (sycl::handler& cgh){
+            sycl::accessor <float, 1, sycl::access::mode::read_write, sycl::access::target::local>
+                         local_real(sycl::range<1>(fft_length), cgh);
+            sycl::accessor <float, 1, sycl::access::mode::read_write, sycl::access::target::local>
+                         local_imag(sycl::range<1>(fft_length), cgh);
+            
+
+
+            auto read_data = buff_data.get_access<sycl::access::mode::read>(cgh);
+            auto real_acc = buff_real.get_access<sycl::access::mode::write>(cgh);
+            auto imag_acc = buff_imag.get_access<sycl::access::mode::write>(cgh);
+
+            cgh.parallel_for<class single_workgroup>(
+                sycl::nd_range<1> (fft_length, fft_length),
+                [=] (sycl::nd_item<1> item) {
+
+                    size_t index = item.get_local_linear_id();
+                    size_t reverse_index = bitReverse(index);
+                    local_real[index] = 0;
+                    local_imag[index] = 0;
+                    local_real[index] = read_data[reverse_index];
+
+                    //synchronize
+                    item.barrier(sycl::access::fence_space::local_space);
+                    //...
+
+                    for (int i = 1; i <= stages; i++) {
+                        int interval = 1;
+                        interval <<= i;
+
+                        int tt_f = (index/(interval >> 1))%2;
+
+                        if (tt_f == 0) {
+                            float t_real = 0;
+                            float t_complex = 0;
+                            int power = (index%interval) * (fft_length/interval);
+                            w_calculator(fft_length, power, t_real, t_complex);
+                            complex_calculator(local_real[index + (interval >> 1)], local_imag[index + (interval >> 1], t_real, t_complex);
+
+                            //synchronize
+                            item.barrier(sycl::access::fence_space::local_space);
+                            //...
+
+                            local_real[index] = local_real[index] + t_real;
+                            local_imag[index] = local_imag[index] + t_complex;
+
+                            //synchronize
+                            item.barrier(sycl::access::fence_space::local_space);
+                            //...
+                        }
+                        else {
+                            float t_real = 0;
+                            float t_complex = 0;
+                            int power = (index%interval) * (fft_length/interval);
+                            w_calculator(fft_length, power, t_real, t_complex);
+                            float fence_add_r = local_real[index - (interval >> 1)];
+                            float fence_add_i = local_imag[index - (interval >> 1)];
+
+                            //synchronize
+                            item.barrier(sycl::access::fence_space::local_space);
+                            //...
+
+                            local_real[index] = t_real + fence_add_r;
+                            local_imag[index] = t_imag + fence_add_i;
+
+                            //synchronize
+                            item.barrier(sycl::access::fence_space::local_space);
+                            //...
+                        }
+                    }
+
+                    real_acc[index] = local_real[index];
+                    imag_acc[index] = local_imag[index];
+
+                }
+            );
+        });
+
+    }
+
+
 }

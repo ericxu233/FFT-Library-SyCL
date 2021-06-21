@@ -8,13 +8,13 @@ int main() {
 
     sycl_fft_setup();
 
-    rs_parrallel(data, output_r, output_c);
+    fft_group_size(data, output_r, output_c);
 
     for (size_t i = 0; i < output_c.size(); i++) {
         cout << "( " << output_r[i] << " , " << output_c[i] << " )" << endl; 
     }
     //damn
-    
+
 
     return 0;
 }
