@@ -45,9 +45,10 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
     size_t stages = 0;
     size_t length = data.size();
     size_t length2 = 2*length;
+    size_t tempp = length;
 
-    while (length != 1) {
-        length /= 2;
+    while (tempp != 1) {
+        tempp /= 2;
         stages++; 
     } 
     cout << stages << endl;
@@ -100,8 +101,8 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                     out << temp_index << sycl::endl;
                     real_acc[i] = 0;
                     real_acc[i + length] = 0;
-                    complex_acc[i] = 1.2;
-                    complex_acc[i + length] = 1.2;
+                    complex_acc[i] = 0;
+                    complex_acc[i + length] = 0;
                     real_acc[i] = data_acc[temp_index];
                 }
             );
