@@ -9,7 +9,7 @@
     - fast e power
 */
 
-size_t int bitReverse(size_t x, size_t length) {
+size_t bitReverse(size_t x, size_t length) {
 
     unsigned int rev = 0;
      
