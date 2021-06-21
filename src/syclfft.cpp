@@ -89,12 +89,12 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
             auto data_acc = buff_data.get_access<sycl::access::mode::read>(cgh); //read only input data
             auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
             auto complex_acc = buff_complex.get_access<sycl::access::mode::read_write>(cgh);
-
+            sycl::stream out(1024, 256, cgh);
             //now is the hard part, the parallel sycl algorithm
             cgh.parallel_for<class setup_kernal>(
                 sycl::range<1>(length), [=] (sycl::id<1> i) {
                     size_t temp_index = bitReverse(i, stages);
-                    cout << i << endl;
+                    out << temp_index << sycl::endl;
                     real_acc[i] = 0;
                     real_acc[i + length] = 0;
                     complex_acc[i] = 0;
