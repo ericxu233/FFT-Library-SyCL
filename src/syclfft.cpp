@@ -174,7 +174,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
         }
         
         cout << "core parallelism is done" << endl;
-
+        //damn
         queue.submit([&] (sycl::handler& cgh) {
             auto real_acc = buff_real.get_access<sycl::access::mode::read>(cgh);
             auto complex_acc = buff_complex.get_access<sycl::access::mode::read>(cgh);

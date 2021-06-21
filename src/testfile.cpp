@@ -13,7 +13,8 @@ int main() {
     for (size_t i = 0; i < output_c.size(); i++) {
         cout << "( " << output_r[i] << " , " << output_c[i] << " )" << endl; 
     }
-
+    //damn
+    
 
     return 0;
 }
