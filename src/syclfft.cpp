@@ -56,7 +56,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
 
 
 
-    sycl::device device = sycl::default_selector{}.select_device();
+    sycl::device device = sycl::default_selector{};//.select_device();
 
     sycl::queue queue(device, [] (sycl::exception_list el) {
        for (auto ex : el) { std::rethrow_exception(ex); }
