@@ -58,13 +58,13 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
 
     sycl::device device = sycl::default_selector{}.select_device();
     
-    sycl::queue queue(sycl::default_selector{});
+    //sycl::queue queue(sycl::default_selector{});
 
-    /*
+    
     sycl::queue queue(device, [] (sycl::exception_list el) {
        for (auto ex : el) { std::rethrow_exception(ex); }
     } );
-    */
+    
     cout << "sycl exception setup is working" << endl;
 
     for (size_t i = 0; i < 8; i++) {
@@ -100,8 +100,8 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                     out << temp_index << sycl::endl;
                     real_acc[i] = 0;
                     real_acc[i + length] = 0;
-                    complex_acc[i] = 0;
-                    complex_acc[i + length] = 0;
+                    complex_acc[i] = 1.2;
+                    complex_acc[i + length] = 1.2;
                     real_acc[i] = data_acc[temp_index];
                 }
             );
