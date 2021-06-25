@@ -276,11 +276,16 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             int power = (index1%interval) * (fft_length/interval);
                             w_calculator(fft_length, power, t_real, t_complex);
                             out << t_real << " , " << t_complex << " comp " << index1 << sycl::endl;
-                            complex_calculator(local_real[index1 + (interval >> 1)], local_imag[index1 + (interval >> 1)], t_real, t_complex);
+                            float dd_real= 0; 
+                            float dd_complex = 0;
+                            dd_real = local_real[index1 + (interval >> 1)];
+                            dd_complex = local_imag[index1 + (interval >> 1)];
 
                             //synchronize
                             item.barrier(sycl::access::fence_space::local_space);
                             //...
+
+                            complex_calculator(dd_real, dd_complex, t_real, t_complex);
 
                             local_real[index1] = local_real[index1] + t_real;
                             local_imag[index1] = local_imag[index1] + t_complex;
