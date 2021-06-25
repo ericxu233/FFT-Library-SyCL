@@ -154,7 +154,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                             float t_complex = 0;
                             int power = (j%interval) * (length/interval);
                             w_calculator(length, power, t_real, t_complex);
-                            out << t_real << " , " << t_complex << " comp" << sycl::endl;
+                            out << t_real << " , " << t_complex << " comp " << index << sycl::endl;
                             complex_calculator(real_acc[j + offset_write + (interval >> 1)], complex_acc[j + offset_write + (interval >> 1)], t_real, t_complex);
                             real_acc[j + offset_read] = real_acc[j + offset_write] + t_real;
                             complex_acc[j + offset_read] = complex_acc[j + offset_write] + t_complex;
@@ -166,7 +166,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                             float t_complex = 0;
                             int power = (j%interval) * (length/interval);
                             w_calculator(length, power, t_real, t_complex);
-                            out << t_real << " , " << t_complex << " comp" << sycl::endl;
+                            out << t_real << " , " << t_complex << " comp" << index << sycl::endl;
                             complex_calculator(real_acc[j + offset_write], complex_acc[j + offset_write], t_real, t_complex);
                             real_acc[j + offset_read] = t_real + real_acc[j + offset_write - (interval >> 1)];
                             complex_acc[j + offset_read] = t_complex + complex_acc[j + offset_write - (interval >> 1)];
@@ -275,7 +275,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             float t_complex = 0;
                             int power = (index%interval) * (fft_length/interval);
                             w_calculator(fft_length, power, t_real, t_complex);
-                            out << t_real << " , " << t_complex << " comp" << sycl::endl;
+                            out << t_real << " , " << t_complex << " comp" << index << sycl::endl;
                             complex_calculator(local_real[index + (interval >> 1)], local_imag[index + (interval >> 1)], t_real, t_complex);
 
                             //synchronize
@@ -295,7 +295,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             float t_complex = 0;
                             int power = (index%interval) * (fft_length/interval);
                             w_calculator(fft_length, power, t_real, t_complex);
-                            out << t_real << " , " << t_complex << " comp" << sycl::endl;
+                            out << t_real << " , " << t_complex << " comp" << index << sycl::endl;
                             complex_calculator(local_real[index], local_imag[index], t_real, t_complex);
                             float fence_add_r = local_real[index - (interval >> 1)];
                             float fence_add_i = local_imag[index - (interval >> 1)];
