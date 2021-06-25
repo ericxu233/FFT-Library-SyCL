@@ -211,6 +211,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
         tempp /= 2;
         stages++; 
     }
+    cout << stages << endl;
 
     real.resize(data.size());
     imag.resize(data.size());
@@ -309,7 +310,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                 }
             );
         });
-
+        queue.wait_and_throw();
     }
 
 
