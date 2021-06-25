@@ -213,7 +213,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
     }
 
     real.resize(data.size());
-    complex.resize(data.size());
+    imag.resize(data.size());
 
     sycl::device device = sycl::default_selector{}.select_device();
     
@@ -248,7 +248,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                 [=] (sycl::nd_item<1> item) {
 
                     size_t index = item.get_local_linear_id();
-                    size_t reverse_index = bitReverse(index);
+                    size_t reverse_index = bitReverse(index, stages);
                     local_real[index] = 0;
                     local_imag[index] = 0;
                     local_real[index] = read_data[reverse_index];
@@ -268,7 +268,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             float t_complex = 0;
                             int power = (index%interval) * (fft_length/interval);
                             w_calculator(fft_length, power, t_real, t_complex);
-                            complex_calculator(local_real[index + (interval >> 1)], local_imag[index + (interval >> 1], t_real, t_complex);
+                            complex_calculator(local_real[index + (interval >> 1)], local_imag[index + (interval >> 1)], t_real, t_complex);
 
                             //synchronize
                             item.barrier(sycl::access::fence_space::local_space);
@@ -294,7 +294,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             //...
 
                             local_real[index] = t_real + fence_add_r;
-                            local_imag[index] = t_imag + fence_add_i;
+                            local_imag[index] = t_complex + fence_add_i;
 
                             //synchronize
                             item.barrier(sycl::access::fence_space::local_space);
