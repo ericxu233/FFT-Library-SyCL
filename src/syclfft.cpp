@@ -154,7 +154,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                             float t_complex = 0;
                             int power = (j%interval) * (length/interval);
                             w_calculator(length, power, t_real, t_complex);
-                            out << t_real << " , " << t_complex << " comp " << index << sycl::endl;
+                            out << t_real << " , " << t_complex << " comp " << j << sycl::endl;
                             complex_calculator(real_acc[j + offset_write + (interval >> 1)], complex_acc[j + offset_write + (interval >> 1)], t_real, t_complex);
                             real_acc[j + offset_read] = real_acc[j + offset_write] + t_real;
                             complex_acc[j + offset_read] = complex_acc[j + offset_write] + t_complex;
@@ -166,7 +166,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                             float t_complex = 0;
                             int power = (j%interval) * (length/interval);
                             w_calculator(length, power, t_real, t_complex);
-                            out << t_real << " , " << t_complex << " comp" << index << sycl::endl;
+                            out << t_real << " , " << t_complex << " comp" << j << sycl::endl;
                             complex_calculator(real_acc[j + offset_write], complex_acc[j + offset_write], t_real, t_complex);
                             real_acc[j + offset_read] = t_real + real_acc[j + offset_write - (interval >> 1)];
                             complex_acc[j + offset_read] = t_complex + complex_acc[j + offset_write - (interval >> 1)];
