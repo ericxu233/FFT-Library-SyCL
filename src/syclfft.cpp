@@ -229,7 +229,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
     {
         sycl::buffer<float, 1> buff_data(data.data(), sycl::range<1>(data.size()));
         sycl::buffer<float, 1> buff_real(real.data(), sycl::range<1>(data.size()));
-        sycl::buffer<float, 1> buff_imag(image.data(), sycl::range<1>(data.size()));
+        sycl::buffer<float, 1> buff_imag(imag.data(), sycl::range<1>(data.size()));
 
         queue.submit([&] (sycl::handler& cgh){
             sycl::accessor <float, 1, sycl::access::mode::read_write, sycl::access::target::local>
