@@ -128,7 +128,7 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
             queue.submit([&] (sycl::handler& cgh) {
                 auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
                 auto complex_acc = buff_complex.get_access<sycl::access::mode::read_write>(cgh);
-
+                sycl::stream out(1024, 256, cgh);
                 //now is the hard part, the parallel sycl algorithm
                 cgh.parallel_for<class fft_kernal>(
                     sycl::range<1>(length), [=] (sycl::id<1> j) {
@@ -158,6 +158,8 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                             complex_calculator(real_acc[j + offset_write + (interval >> 1)], complex_acc[j + offset_write + (interval >> 1)], t_real, t_complex);
                             real_acc[j + offset_read] = real_acc[j + offset_write] + t_real;
                             complex_acc[j + offset_read] = complex_acc[j + offset_write] + t_complex;
+
+                            out << real_acc[j + offset_read] << " , " << complex_acc[j + offset_read] << sycl::endl;
                         }
                         else {
                             float t_real = 0;
@@ -167,6 +169,8 @@ void rs_parrallel(vector<float>& data, vector<float>& real, vector<float>& compl
                             complex_calculator(real_acc[j + offset_write], complex_acc[j + offset_write], t_real, t_complex);
                             real_acc[j + offset_read] = t_real + real_acc[j + offset_write - (interval >> 1)];
                             complex_acc[j + offset_read] = t_complex + complex_acc[j + offset_write - (interval >> 1)];
+
+                            out << real_acc[j + offset_read] << " , " << complex_acc[j + offset_read] << sycl::endl;
                         }
                         
                     }
@@ -254,7 +258,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                     local_real[index] = 0;
                     local_imag[index] = 0;
                     local_real[index] = read_data[reverse_index];
-                    out << "this is " << index << " with reverse of " << reverse_index << " with value of " << local_real[index] << sycl::endl;
+                    //out << "this is " << index << " with reverse of " << reverse_index << " with value of " << local_real[index] << sycl::endl;
                     //synchronize
                     item.barrier(sycl::access::fence_space::local_space);
                     //...
@@ -279,6 +283,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             local_real[index] = local_real[index] + t_real;
                             local_imag[index] = local_imag[index] + t_complex;
 
+                            out << local_real[index] << " , " << local_imag[index] << sycl::endl;
                             //synchronize
                             item.barrier(sycl::access::fence_space::local_space);
                             //...
@@ -299,6 +304,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             local_real[index] = t_real + fence_add_r;
                             local_imag[index] = t_complex + fence_add_i;
 
+                            out << local_real[index] << " , " << local_imag[index] << sycl::endl;
                             //synchronize
                             item.barrier(sycl::access::fence_space::local_space);
                             //...
