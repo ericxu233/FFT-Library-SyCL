@@ -285,7 +285,10 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             local_real[index1] = local_real[index1] + t_real;
                             local_imag[index1] = local_imag[index1] + t_complex;
 
-                            out << local_real[index1] << " , " << local_imag[index1] << "ee" << index1 << sycl::endl;
+                            out << t_real << " + " << local_real[index1] << " pp " << index1 << sycl::endl;
+                            out << t_complex << " + " << local_imag[index1] << " pp " << index1 << sycl::endl;
+
+                            out << local_real[index1] << " , " << local_imag[index1] << " ee " << index1 << sycl::endl;
                             //synchronize
                             item.barrier(sycl::access::fence_space::local_space);
                             //...
@@ -303,11 +306,13 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             //synchronize
                             item.barrier(sycl::access::fence_space::local_space);
                             //...
+                            out << t_real << " + " << fence_add_r << " pp " << index1 << sycl::endl;
+                            out << t_complex << " + " << fence_add_i << " pp " << index1 << sycl::endl;
 
                             local_real[index1] = t_real + fence_add_r;
                             local_imag[index1] = t_complex + fence_add_i;
 
-                            out << local_real[index1] << " , " << local_imag[index1] << "ee" << index1 << sycl::endl;
+                            out << local_real[index1] << " , " << local_imag[index1] << " ee " << index1 << sycl::endl;
                             //synchronize
                             item.barrier(sycl::access::fence_space::local_space);
                             //...
