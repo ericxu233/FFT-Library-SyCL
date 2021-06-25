@@ -238,7 +238,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
             sycl::accessor <float, 1, sycl::access::mode::read_write, sycl::access::target::local>
                          local_imag(sycl::range<1>(fft_length), cgh);
             
-
+            sycl::stream out(1024, 256, cgh);
 
             auto read_data = buff_data.get_access<sycl::access::mode::read>(cgh);
             auto real_acc = buff_real.get_access<sycl::access::mode::write>(cgh);
@@ -247,6 +247,8 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
             cgh.parallel_for<class single_workgroup>(
                 sycl::nd_range<1> (fft_length, fft_length),
                 [=] (sycl::nd_item<1> item) {
+                    
+                    out << "hello" << sycl::endl;
 
                     size_t index = item.get_local_linear_id();
                     size_t reverse_index = bitReverse(index, stages);
@@ -258,7 +260,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                     item.barrier(sycl::access::fence_space::local_space);
                     //...
 
-                    for (int i = 1; i <= stages; i++) {
+                    for (size_t i = 1; i <= stages; i++) {
                         int interval = 1;
                         interval <<= i;
 
