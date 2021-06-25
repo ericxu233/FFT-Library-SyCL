@@ -248,14 +248,14 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                 sycl::nd_range<1> (fft_length, fft_length),
                 [=] (sycl::nd_item<1> item) {
                     
-                    out << "hello" << sycl::endl;
+                    //out << "hello" << sycl::endl;
 
                     size_t index = item.get_local_linear_id();
                     size_t reverse_index = bitReverse(index, stages);
                     local_real[index] = 0;
                     local_imag[index] = 0;
                     local_real[index] = read_data[reverse_index];
-
+                    out << "this is " << index << " with reverse of " << reverse_index << sycl::endl;
                     //synchronize
                     item.barrier(sycl::access::fence_space::local_space);
                     //...
