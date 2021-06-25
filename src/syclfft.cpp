@@ -286,6 +286,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             float t_complex = 0;
                             int power = (index%interval) * (fft_length/interval);
                             w_calculator(fft_length, power, t_real, t_complex);
+                            complex_calculator(local_real[index], local_imag[index], t_real, t_complex);
                             float fence_add_r = local_real[index - (interval >> 1)];
                             float fence_add_i = local_imag[index - (interval >> 1)];
 
