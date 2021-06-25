@@ -270,33 +270,50 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
 
                         int tt_f = (index1/(interval >> 1))%2;
 
-                        if (tt_f == 0) {
-                            float t_real = 0;
-                            float t_complex = 0;
-                            int power = (index1%interval) * (fft_length/interval);
-                            w_calculator(fft_length, power, t_real, t_complex);
-                            out << t_real << " , " << t_complex << " comp " << index1 << sycl::endl;
-                            
-                            //synchronize
-                            item.barrier(sycl::access::fence_space::local_space);
-                            //...
-                            out << local_real[index1 + (interval >> 1)] << " , " << local_imag[index1 + (interval >> 1)] << " exclimation111 " << index1 << sycl::endl;
-                            complex_calculator(local_real[index1 + (interval >> 1)], local_imag[index1 + (interval >> 1)], t_real, t_complex);
-                            out << t_real << " exclimation " << index1 << sycl::endl;
-                            //synchronize
-                            item.barrier(sycl::access::fence_space::local_space);
-                            //...
+                        
+                        float t_real = 0;
+                        float t_complex = 0;
 
+                        float fence_add_r = 0;
+                        float fence_add_i = 0;
+
+                        int power = (index1%interval) * (fft_length/interval);
+                        w_calculator(fft_length, power, t_real, t_complex);
+                        //out << t_real << " , " << t_complex << " comp " << index1 << sycl::endl;
+                            
+                        //out << local_real[index1 + (interval >> 1)] << " , " << local_imag[index1 + (interval >> 1)] << " exclimation111 " << index1 << sycl::endl;
+                        if (tt_f == 0) {
+                            complex_calculator(local_real[index1 + (interval >> 1)], local_imag[index1 + (interval >> 1)], t_real, t_complex);
+                        }
+                        else {
+                            complex_calculator(local_real[index1], local_imag[index1], t_real, t_complex);
+                            fence_add_r = local_real[index1 - (interval >> 1)];
+                            fence_add_i = local_imag[index1 - (interval >> 1)];
+                        }
+                        //out << t_real << " exclimation " << index1 << sycl::endl;
+                        //synchronize
+                        item.barrier(sycl::access::fence_space::local_space);
+                        //...
+                        if (tt_f == 0) {
                             local_real[index1] = local_real[index1] + t_real;
                             local_imag[index1] = local_imag[index1] + t_complex;
+                        }
+                        else {
+                            local_real[index1] = t_real + fence_add_r;
+                            local_imag[index1] = t_complex + fence_add_i;
+                        }
+                        //synchronize
+                        item.barrier(sycl::access::fence_space::local_space);
+                        //...
 
-                            out << t_real << " + " << local_real[index1] << " pp " << index1 << sycl::endl;
-                            out << t_complex << " + " << local_imag[index1] << " pp " << index1 << sycl::endl;
+                        //out << t_real << " + " << local_real[index1] << " pp " << index1 << sycl::endl;
+                        //out << t_complex << " + " << local_imag[index1] << " pp " << index1 << sycl::endl;
 
-                            out << local_real[index1] << " , " << local_imag[index1] << " ee " << index1 << sycl::endl;
-                            //synchronize
-                            item.barrier(sycl::access::fence_space::local_space);
-                            //...
+                        //out << local_real[index1] << " , " << local_imag[index1] << " ee " << index1 << sycl::endl;
+                        //synchronize
+                        //item.barrier(sycl::access::fence_space::local_space);
+                        //...
+                        /*
                         }
                         else {
                             float t_real = 0;
@@ -327,6 +344,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             item.barrier(sycl::access::fence_space::local_space);
                             //...
                         }
+                        */
                     }
 
                     real_acc[index1] = local_real[index1];
