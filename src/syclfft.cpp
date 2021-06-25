@@ -280,7 +280,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
                             //synchronize
                             item.barrier(sycl::access::fence_space::local_space);
                             //...
-
+                            out << local_real[index1 + (interval >> 1)] << " , " << local_imag[index1 + (interval >> 1)] << " exclimation111 " << index1 << sycl::endl;
                             complex_calculator(local_real[index1 + (interval >> 1)], local_imag[index1 + (interval >> 1)], t_real, t_complex);
                             out << t_real << " exclimation " << index1 << sycl::endl;
                             //synchronize
