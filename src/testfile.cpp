@@ -14,7 +14,7 @@ int main() {
         cout << "( " << output_r[i] << " , " << output_c[i] << " )" << endl; 
     }
     //damn
-
+    //damn another mileston
 
     return 0;
 }
