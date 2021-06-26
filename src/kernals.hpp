@@ -79,7 +79,7 @@ public:
 
         }
 
-        real[global_index] = local_real[gloabl];
+        real[global_index] = local_real[index1];
         imag[global_index] = local_imag[index1];
     }
 
@@ -109,9 +109,9 @@ class second_reduction{
 
 public:
     group_reduction(size_t length, size_t stagesR, rewr_acc realR, 
-    rewr_acc imagR, rewr_acc local_realR, rewr_acc local_imagR, size_t phase, size_t group):
+    rewr_acc imagR, rewr_acc local_realR, rewr_acc local_imagR, size_t group):
     fft_length(length), stages(stagesR), real(realR), imag(imagR),
-    local_real(local_realR), local_imag(local_imagR), phase2(phase), group_size(group)
+    local_real(local_realR), local_imag(local_imagR), group_size(group)
     {}
 
     operator()(sycl::nd_item<1> item){
@@ -177,7 +177,6 @@ public:
 private:
     size_t fft_length;
     size_t stages;
-    size_t phase2;
     size_t group_size;
     rewr_acc real;
     rewr_acc imag;

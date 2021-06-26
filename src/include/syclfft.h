@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <CL/sycl.hpp>
+#include <cmath>
 
 namespace sycl = cl::sycl;
 using namespace std;
@@ -20,3 +21,6 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& com
 
 //
 void fft_optimized_parallel(vector<float>& data, vector<float>& real, vector<float>& complex);
+
+//
+void fft_sycl(vector<float>& data, vector<float>& real, vector<float>& complex);
