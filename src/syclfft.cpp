@@ -22,6 +22,7 @@ class finish_kernal;
 class single_workgroup;
 
 void fft_1024_1024(vector<float>& data, vector<float>& real, vector<float>& complex);
+void test(int group_size, int groups);
 
 void sycl_fft_setup() {
     sycl::device device = sycl::default_selector{}.select_device();
@@ -323,6 +324,10 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
 
 
 void fft_1024_1024(vector<float>& data, vector<float>& real, vector<float>& complex) {
+
+    //only for testing
+    test(4, 4);
+
     const size_t fft_length = data.size();
     const size_t phase = fft_length/ (Devicespec::dim1);
     const size_t items = Devicespec::dim1;
@@ -397,4 +402,18 @@ void fft_1024_1024(vector<float>& data, vector<float>& real, vector<float>& comp
 
 
 
+}
+
+
+//...
+/*
+
+    below are functions for testing
+
+*/
+//...
+
+void test(int group_size, int groups) {
+    Devicespec::work_group_size = groups;
+    Devicespec::dim1 = group_size
 }
