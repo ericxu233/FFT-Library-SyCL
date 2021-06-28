@@ -21,7 +21,6 @@ class finish_kernal;
 
 class single_workgroup;
 
-void fft_1024_1024(vector<float>& data, vector<float>& real, vector<float>& complex);
 void test(int group_size, int groups);
 
 void sycl_fft_setup() {
@@ -323,7 +322,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
 }
 
 
-void fft_1024_1024(vector<float>& data, vector<float>& real, vector<float>& imag) {
+void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) {
 
     //only for testing
     test(4, 4);
