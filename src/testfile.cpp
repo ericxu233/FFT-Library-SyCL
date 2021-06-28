@@ -8,7 +8,7 @@ int main() {
 
     sycl_fft_setup();
 
-    fft_group_size(data, output_r, output_c);
+    fft_max_max(data, output_r, output_c);
 
     for (size_t i = 0; i < output_c.size(); i++) {
         cout << "( " << output_r[i] << " , " << output_c[i] << " )" << endl; 
