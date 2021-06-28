@@ -96,11 +96,9 @@ private:
 
 
 class second_reduction{
-    using read_acc =
-		    sycl::accessor<float, 1, sycl::access::mode::read, sycl::access::target::global_buffer>;
+    using rwg_acc =
+		    sycl::accessor<float, 1, sycl::access::mode::read_write, sycl::access::target::global_buffer>;
 
-    using write_acc =
-		    sycl::accessor<float, 1, sycl::access::mode::write, sycl::access::target::global_buffer>;
 
     using rewr_acc =
 		    sycl::accessor<float, 1, sycl::access::mode::read_write, sycl::access::target::local>;
@@ -108,8 +106,8 @@ class second_reduction{
 
 
 public:
-    second_reduction(size_t length, size_t stagesR, rewr_acc realR, 
-    rewr_acc imagR, rewr_acc local_realR, rewr_acc local_imagR, size_t group):
+    second_reduction(size_t length, size_t stagesR, rwg_acc realR, 
+    rwg_acc imagR, rewr_acc local_realR, rewr_acc local_imagR, size_t group):
     fft_length(length), stages(stagesR), real(realR), imag(imagR),
     local_real(local_realR), local_imag(local_imagR), group_size(group)
     {}
@@ -178,8 +176,8 @@ private:
     size_t fft_length;
     size_t stages;
     size_t group_size;
-    rewr_acc real;
-    rewr_acc imag;
+    rwg_acc real;
+    rwg_acc imag;
     rewr_acc local_real;
     rewr_acc local_imag;
 };
