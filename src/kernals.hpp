@@ -22,7 +22,7 @@ public:
     local_real(local_realR), local_imag(local_imagR)
     {}
 
-    void operator()(sycl::nd_item<1> item) {
+    void operator()(sycl::nd_item<1> item) const{
         size_t index1 = item.get_local_linear_id();
         //index1 means local index
         size_t global_index = item.get_global_linear_id();
@@ -112,7 +112,7 @@ public:
     local_real(local_realR), local_imag(local_imagR), group_size(group)
     {}
 
-    void operator()(sycl::nd_item<1> item){
+    void operator()(sycl::nd_item<1> item) const{
         size_t group_id = item.get_group_linear_id();
         size_t global_index = item.get_global_linear_id();
         size_t local_index = item.get_local_linear_id();
