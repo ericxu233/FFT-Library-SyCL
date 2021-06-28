@@ -1,6 +1,6 @@
 #include "include/syclfft.h"
 #include "compute_utility.h"
-
+#include "kernals.hpp"
 
 namespace Devicespec {
     size_t work_group_size;
@@ -323,7 +323,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
 }
 
 
-void fft_1024_1024(vector<float>& data, vector<float>& real, vector<float>& complex) {
+void fft_1024_1024(vector<float>& data, vector<float>& real, vector<float>& imag) {
 
     //only for testing
     test(4, 4);
@@ -370,7 +370,7 @@ void fft_1024_1024(vector<float>& data, vector<float>& real, vector<float>& comp
             auto imag_acc = buff_imag.get_access<sycl::access::mode::write>(cgh);
             
             cgh.parallel_for(sycl::nd_range<1>(fft_length, items), 
-                        group_reduction(length, stages, read_data, real_acc, imag_acc,
+                        group_reduction(fft_length, stages, read_data, real_acc, imag_acc,
                         local_real, local_imag));
         });
         queue.wait_and_throw();
@@ -415,5 +415,5 @@ void fft_1024_1024(vector<float>& data, vector<float>& real, vector<float>& comp
 
 void test(int group_size, int groups) {
     Devicespec::work_group_size = groups;
-    Devicespec::dim1 = group_size
+    Devicespec::dim1 = group_size;
 }
