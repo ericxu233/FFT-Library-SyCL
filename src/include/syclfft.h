@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <CL/sycl.hpp>
-#include <cmath>
+//#include <cmath>
 
 namespace sycl = cl::sycl;
 using namespace std;
