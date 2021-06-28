@@ -389,12 +389,12 @@ void fft_1024_1024(vector<float>& data, vector<float>& real, vector<float>& imag
             sycl::accessor <float, 1, sycl::access::mode::read_write, sycl::access::target::local>
                          local_imag(sycl::range<1>(fft_length/groups), cgh);
             
-            auto read_data = buff_data.get_access<sycl::access::mode::read>(cgh);
+            //auto read_data = buff_data.get_access<sycl::access::mode::read>(cgh);
             auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
             auto imag_acc = buff_imag.get_access<sycl::access::mode::read_write>(cgh);
             
             cgh.parallel_for(sycl::nd_range<1>(fft_length, fft_length/groups), 
-                        second_reduction(fft_length/groups, stages, read_data, real_acc, imag_acc,
+                        second_reduction(fft_length/groups, stages, real_acc, imag_acc,
                         local_real, local_imag, groups));
         });
         queue.wait_and_throw();   
