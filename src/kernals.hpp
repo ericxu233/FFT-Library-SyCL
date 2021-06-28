@@ -108,13 +108,13 @@ class second_reduction{
 
 
 public:
-    group_reduction(size_t length, size_t stagesR, rewr_acc realR, 
+    second_reduction(size_t length, size_t stagesR, rewr_acc realR, 
     rewr_acc imagR, rewr_acc local_realR, rewr_acc local_imagR, size_t group):
     fft_length(length), stages(stagesR), real(realR), imag(imagR),
     local_real(local_realR), local_imag(local_imagR), group_size(group)
     {}
 
-    operator()(sycl::nd_item<1> item){
+    void operator()(sycl::nd_item<1> item){
         size_t group_id = item.get_group_linear_id();
         size_t global_index = item.get_global_linear_id();
         size_t local_index = item.get_local_linear_id();

@@ -394,7 +394,7 @@ void fft_1024_1024(vector<float>& data, vector<float>& real, vector<float>& imag
             auto imag_acc = buff_imag.get_access<sycl::access::mode::read_write>(cgh);
             
             cgh.parallel_for(sycl::nd_range<1>(fft_length, fft_length/groups), 
-                        group_reduction(fft_length/groups, stages, read_data, real_acc, imag_acc,
+                        second_reduction(fft_length/groups, stages, read_data, real_acc, imag_acc,
                         local_real, local_imag, groups));
         });
         queue.wait_and_throw();   
