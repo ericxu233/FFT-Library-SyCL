@@ -20,7 +20,7 @@ class setup_kernal;
 class finish_kernal;
 
 class single_workgroup;
-
+g
 void test(int group_size, int groups);
 
 void sycl_fft_setup() {
