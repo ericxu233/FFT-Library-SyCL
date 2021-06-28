@@ -10,7 +10,7 @@ class group_reduction {
 		    sycl::accessor<float, 1, sycl::access::mode::write, sycl::access::target::global_buffer>;
 
     using rewr_acc =
-		    sycl::accessor<float, 1, sycl::access::mode::read_write, sycl::access::target::local_buffer>;
+		    sycl::accessor<float, 1, sycl::access::mode::read_write, sycl::access::target::local>;
 
 
 
@@ -103,7 +103,7 @@ class second_reduction{
 		    sycl::accessor<float, 1, sycl::access::mode::write, sycl::access::target::global_buffer>;
 
     using rewr_acc =
-		    sycl::accessor<float, 1, sycl::access::mode::read_write, sycl::access::target::local_buffer>;
+		    sycl::accessor<float, 1, sycl::access::mode::read_write, sycl::access::target::local>;
 
 
 
