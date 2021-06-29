@@ -7,7 +7,7 @@ namespace sycl = cl::sycl;
 int main() {
     sycl::device device = sycl::default_selector{}.select_device();
 
-    auto work_group_size = device.get_info<sycl::info::device::max_work_group_size>();
+    auto work_group_size = device.get_info<sycl::info::device::max_compute_units>();
     std::cout << "This is max work group size: " << work_group_size << std::endl;
 
     auto max_work_item = device.get_info<sycl::info::device::max_work_item_sizes>();

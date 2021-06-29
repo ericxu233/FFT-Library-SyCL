@@ -16,16 +16,16 @@ class group_reduction {
 
 public:
     //note stages should be 10 in this case!!!
-    group_reduction(size_t length, size_t stagesR, read_acc dataR,
-    write_acc realR, write_acc imagR, rewr_acc local_realR, rewr_acc local_imagR):
+    group_reduction(size_t length, size_t stagesR, read_acc dataR, write_acc realR, 
+    write_acc imagR, rewr_acc local_realR, rewr_acc local_imagR, size_t offset, sycl::stream out):
     fft_length(length), stages(stagesR), data(dataR), real(realR), imag(imagR),
-    local_real(local_realR), local_imag(local_imagR)
+    local_real(local_realR), local_imag(local_imagR), offset(offset), out(out)
     {}
 
     void operator()(sycl::nd_item<1> item) const{
         size_t index1 = item.get_local_linear_id();
         //index1 means local index
-        size_t global_index = item.get_global_linear_id();
+        size_t global_index = item.get_global_linear_id() + offset;
         size_t reverse_index = bitReverse(global_index, stages);
         local_real[index1] = 0;
         local_imag[index1] = 0;
@@ -92,6 +92,8 @@ private:
     write_acc imag;
     rewr_acc local_real;
     rewr_acc local_imag;
+    size_t offset;
+    sycl::stream out;
 };
 
 
@@ -107,9 +109,9 @@ class second_reduction{
 
 public:
     second_reduction(size_t length, size_t stagesR, rwg_acc realR, 
-    rwg_acc imagR, rewr_acc local_realR, rewr_acc local_imagR, size_t group):
+    rwg_acc imagR, rewr_acc local_realR, rewr_acc local_imagR, size_t group, size_t offset, sycl::stream out):
     fft_length(length), stages(stagesR), real(realR), imag(imagR),
-    local_real(local_realR), local_imag(local_imagR), group_size(group)
+    local_real(local_realR), local_imag(local_imagR), stride(group), offset(offset), out(out)
     {}
 
     void operator()(sycl::nd_item<1> item) const{
@@ -117,8 +119,8 @@ public:
         size_t global_index = item.get_global_linear_id();
         size_t local_index = item.get_local_linear_id();
 
-        local_real[local_index] = real[local_index*group_size + group_id];
-        local_imag[local_index] = imag[local_index*group_size + group_id];
+        local_real[local_index] = real[local_index*stride + group_id];
+        local_imag[local_index] = imag[local_index*stride + group_id];
 
         //synchronize
         item.barrier(sycl::access::fence_space::local_space);
@@ -167,17 +169,19 @@ public:
             //...
         }
 
-        real[local_index*group_size + group_id] = local_real[local_index];
-        imag[local_index*group_size + group_id] = local_imag[local_index];
+        real[local_index*stride + group_id] = local_real[local_index];
+        imag[local_index*stride + group_id] = local_imag[local_index];
 
     }
 
 private:
     size_t fft_length;
     size_t stages;
-    size_t group_size;
+    size_t stride;
     rwg_acc real;
     rwg_acc imag;
     rewr_acc local_real;
     rewr_acc local_imag;
+    size_t offset;
+    sycl::stream out;
 };

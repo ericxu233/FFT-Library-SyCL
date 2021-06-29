@@ -3,3 +3,14 @@
 2. write better parallization methods
 
 3. use kernal classes, refer to Dr. Fong's git hub on this
+
+
+
+4. need to for loop the stages
+
+intel xe IRIS pro
+
+
+same number
+
+first number non-zero, same out put for each element
