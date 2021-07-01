@@ -87,64 +87,6 @@ public:
 
         real[global_index] = local_real[index1];
         imag[global_index] = local_imag[index1];
-
-        //first stage is finished
-        //synchronize
-        item.barrier(sycl::access::fence_space::local_space);
-        //...
-
-        local_real[index1] = real[(index1%group_range)*local_range + index1/group_range + offset];
-        local_imag[index1] = imag[(index1%group_range)*local_range + index1/group_range + offset];
-
-        //synchronize
-        item.barrier(sycl::access::fence_space::local_space);
-        //...
-
-        for (size_t i = 1; i <= phase2_stages; i++) {
-            int interval = 1;
-            interval <<= i;
-
-            int tt_f = (index1/(interval >> 1))%2;
-
-                        
-            float t_real = 0;
-            float t_complex = 0;
-
-            float fence_add_r = 0;
-            float fence_add_i = 0;
-
-            int power = (index1%interval) * (fft_length/interval);
-            w_calculator(fft_length, power, t_real, t_complex);
-                        
-            if (tt_f == 0) {
-                complex_calculator(local_real[index1 + (interval >> 1)], local_imag[index1 + (interval >> 1)], t_real, t_complex);
-            }
-            else {
-                complex_calculator(local_real[index1], local_imag[index1], t_real, t_complex);
-                fence_add_r = local_real[index1 - (interval >> 1)];
-                fence_add_i = local_imag[index1 - (interval >> 1)];
-            }
-                        
-            //synchronize
-            item.barrier(sycl::access::fence_space::local_space);
-            //...
-
-            if (tt_f == 0) {
-                local_real[index1] = local_real[index1] + t_real;
-                local_imag[index1] = local_imag[index1] + t_complex;
-            }
-            else {
-                local_real[index1] = t_real + fence_add_r;
-                local_imag[index1] = t_complex + fence_add_i;
-            }
-
-            //synchronize
-            item.barrier(sycl::access::fence_space::local_space);
-            //...
-        }
-
-        real[(index1%group_range)*local_range + index1/group_range + offset] = local_real[index1];
-        imag[(index1%group_range)*local_range + index1/group_range + offset] = 
     }
 
 

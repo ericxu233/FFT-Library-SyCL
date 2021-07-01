@@ -428,7 +428,7 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
             
             cgh.parallel_for(sycl::nd_range<1>(fft_length, fft_length/groups), 
                         second_reduction(fft_length/groups, stages, real_acc, imag_acc,
-                        local_real, local_imag, groups, out));
+                        local_real, local_imag, groups, 4, out)); //note 4 is just a dummy number!!!! Please change it later!!!
         });
         queue.wait_and_throw();   
     }
