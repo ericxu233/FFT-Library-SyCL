@@ -325,7 +325,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
 void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) {
 
     //only for testing
-    test(4, 2);
+    //test(4, 2);
 
     const size_t fft_length = data.size();
     const size_t phase = fft_length/ (Devicespec::dim1);
@@ -338,6 +338,14 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
     while (tempp != 1) {
         tempp /= 2;
         stages++; 
+    }
+
+    tempp = groups;
+    size_t phase2_stages = 0;
+
+    while (tempp != 1) {
+        tempp /= 2;
+        phase2_stages++; 
     }
 
     real.resize(data.size());
@@ -358,6 +366,8 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
         sycl::buffer<float, 1> buff_real(real.data(), sycl::range<1>(data.size()));
         sycl::buffer<float, 1> buff_imag(imag.data(), sycl::range<1>(data.size()));
         
+
+        //first stage for a workgroup whole reduction
         for (size_t i = 1; i*items*groups <= fft_length; i++) {
             queue.submit([&] (sycl::handler& cgh){
                 sycl::accessor <float, 1, sycl::access::mode::read_write, sycl::access::target::local>
@@ -373,7 +383,25 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
             
                 cgh.parallel_for(sycl::nd_range<1>(groups*items, items), 
                         group_reduction(fft_length, stages, read_data, real_acc, imag_acc,
-                        local_real, local_imag, (i - 1)*items*groups, out));
+                        local_real, local_imag, (i - 1)*items*groups, phase2_stages, out));
+            });
+            queue.wait_and_throw();
+
+            queue.submit([&] (sycl::handler& cgh){
+                sycl::accessor <float, 1, sycl::access::mode::read_write, sycl::access::target::local>
+                            local_real(sycl::range<1>(items), cgh);
+                sycl::accessor <float, 1, sycl::access::mode::read_write, sycl::access::target::local>
+                            local_imag(sycl::range<1>(items), cgh);
+            
+                sycl::stream out(1024, 256, cgh);
+            
+                auto read_data = buff_data.get_access<sycl::access::mode::read>(cgh);
+                auto real_acc = buff_real.get_access<sycl::access::mode::write>(cgh);
+                auto imag_acc = buff_imag.get_access<sycl::access::mode::write>(cgh);
+            
+                cgh.parallel_for(sycl::nd_range<1>(groups*items, items), 
+                        phase2_reduction(fft_length, stages, read_data, real_acc, imag_acc,
+                        local_real, local_imag, (i - 1)*items*groups, phase2_stages, out));
             });
             queue.wait_and_throw();
         }
@@ -386,7 +414,7 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
         }
         cout << "this is stages " << stages << endl;
 
-
+        //second stage to finish
         queue.submit([&] (sycl::handler& cgh){
             sycl::accessor <float, 1, sycl::access::mode::read_write, sycl::access::target::local>
                          local_real(sycl::range<1>(fft_length/groups), cgh);
