@@ -378,8 +378,8 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
                 sycl::stream out(1024, 256, cgh);
             
                 auto read_data = buff_data.get_access<sycl::access::mode::read>(cgh);
-                auto real_acc = buff_real.get_access<sycl::access::mode::write>(cgh);
-                auto imag_acc = buff_imag.get_access<sycl::access::mode::write>(cgh);
+                auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
+                auto imag_acc = buff_imag.get_access<sycl::access::mode::read_write>(cgh);
             
                 cgh.parallel_for(sycl::nd_range<1>(groups*items, items), 
                         group_reduction(fft_length, stages, read_data, real_acc, imag_acc,
@@ -396,8 +396,8 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
                 sycl::stream out(1024, 256, cgh);
             
                 auto read_data = buff_data.get_access<sycl::access::mode::read>(cgh);
-                auto real_acc = buff_real.get_access<sycl::access::mode::write>(cgh);
-                auto imag_acc = buff_imag.get_access<sycl::access::mode::write>(cgh);
+                auto real_acc = buff_real.get_access<sycl::access::mode::read_write>(cgh);
+                auto imag_acc = buff_imag.get_access<sycl::access::mode::read_write>(cgh);
             
                 cgh.parallel_for(sycl::nd_range<1>(groups*items, items), 
                         phase2_reduction(fft_length, stages, read_data, real_acc, imag_acc,
