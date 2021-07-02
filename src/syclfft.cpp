@@ -389,8 +389,8 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
             });
             queue.wait_and_throw();
             
-            auto real_acc1 = buff_real.get_access<sycl::access::mode::read_write>();
-            cout << real_acc1[0] << endl;
+            //auto real_acc1 = buff_real.get_access<sycl::access::mode::read_write>();
+            //cout << real_acc1[0] << endl;
 
             queue.submit([&] (sycl::handler& cgh){
                 sycl::accessor <float, 1, sycl::access::mode::read_write, sycl::access::target::local>
