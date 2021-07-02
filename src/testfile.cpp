@@ -12,7 +12,7 @@ int main() {
 
     fft_max_max(data, output_r, output_c);
 
-    for (size_t i = 0; i < output_c.size(); i++) {
+    for (size_t i = 0; i < 16; i++) {
         cout << "( " << output_r[i] << " , " << output_c[i] << " )" << endl; 
     }
     //damn
