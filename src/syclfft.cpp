@@ -335,6 +335,8 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
 
     size_t stages = 0;
 
+    cout << items << "  " << gourps << endl;
+
     while (tempp != 1) {
         tempp /= 2;
         stages++; 
