@@ -26,9 +26,9 @@ void test(int group_size, int groups);
 void sycl_fft_setup() {
     sycl::device device = sycl::default_selector{}.select_device();
 
-    Devicespec::work_group_size = device.get_info<sycl::info::device::max_work_group_size>();
+    Devicespec::work_group_size = device.get_info<sycl::info::device::max_compute_units>();
 
-    auto max_work_item = device.get_info<sycl::info::device::max_compute_units>();
+    auto max_work_item = device.get_info<sycl::info::device::max_work_item_sizes>();
     Devicespec::dim3 = max_work_item[0];
     Devicespec::dim2 = max_work_item[1];
     Devicespec::dim1 = max_work_item[2];
