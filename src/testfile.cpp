@@ -17,7 +17,7 @@ int main() {
     fft_max_max(data, output_r, output_c);
 
 
-    cout << "( " << output_r[0] << " , " << output_c[data.size()/2] << " )" << endl;
+    cout << "( " << output_r[0] << " , " << output_r[data.size()/2] << " )" << endl;
     //for (size_t i = 0; i < 16; i++) {
     //    cout << "( " << output_r[i] << " , " << output_c[i] << " )" << endl; 
     //}
