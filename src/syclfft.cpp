@@ -388,12 +388,13 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
                         local_real, local_imag, (i - 1)*items*groups, phase2_stages, out));
             });
             queue.wait_and_throw();
-            
+            /*
             auto real_acc1 = buff_real.get_access<sycl::access::mode::read_write>();
             auto imag_acc1 = buff_imag.get_access<sycl::access::mode::read_write>();
             for (int j = 0; j < 8; j++) {
                 cout << "(" << real_acc1[j] << " , " << imag_acc1[j] << endl;
             }
+            */
 
             queue.submit([&] (sycl::handler& cgh){
                 sycl::accessor <float, 1, sycl::access::mode::read_write, sycl::access::target::local>
