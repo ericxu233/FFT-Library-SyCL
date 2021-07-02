@@ -2,9 +2,11 @@
 #include <vector>
 
 int main() {
-    vector<float> data = {1, 2, 1, 3, 1, 2, 1, 2/*, 2, 2, 4, 1, 2, 2, 6, 0*/};
+    //vector<float> data = {1, 2, 1, 3, 1, 2, 1, 2/*, 2, 2, 4, 1, 2, 2, 6, 0*/};
     vector<float> output_r;
     vector<float> output_c;
+
+    vector<float> data(1024*8, 1);
 
     sycl_fft_setup();
 

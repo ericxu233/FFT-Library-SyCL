@@ -405,7 +405,7 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
             });
             queue.wait_and_throw();
         }
-
+        /*
         stages = 0;
         size_t t2 = fft_length/items;
         while (t2 != 1) {
@@ -431,6 +431,7 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
                         local_real, local_imag, groups, 4, out)); //note 4 is just a dummy number!!!! Please change it later!!!
         });
         queue.wait_and_throw();   
+        */
     }
 
 
