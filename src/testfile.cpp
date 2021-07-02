@@ -6,15 +6,21 @@ int main() {
     vector<float> output_r;
     vector<float> output_c;
 
-    vector<float> data(1024*8, 1);
+    vector<float> data(1024*8, 0);
+    
+    for (int i = 0; i < data.size(); i++) {
+        data[i] = i%2 + 1;
+    } 
 
     sycl_fft_setup();
 
     fft_max_max(data, output_r, output_c);
 
-    for (size_t i = 0; i < 16; i++) {
-        cout << "( " << output_r[i] << " , " << output_c[i] << " )" << endl; 
-    }
+
+    cout << "( " << output_r[0] << " , " << output_c[data.size()/2] << " )" << endl;
+    //for (size_t i = 0; i < 16; i++) {
+    //    cout << "( " << output_r[i] << " , " << output_c[i] << " )" << endl; 
+    //}
     //damn
     //damn another mileston
 
