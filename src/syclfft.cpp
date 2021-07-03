@@ -338,7 +338,7 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
     cout << items << "  " << groups << endl;
 
     
-    tempp = groups;
+    size_t tempp = groups;
     size_t phase2_stages = 0;
 
     while (tempp != 1) {
@@ -382,7 +382,7 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
                 auto imag_acc = buff_imag.get_access<sycl::access::mode::read_write>(cgh);
             
                 cgh.parallel_for(sycl::nd_range<1>(groups*items, items), 
-                        group_reduction(fft_length, stages, read_data, real_acc, imag_acc,
+                        group_reduction(fft_length, local_stages, read_data, real_acc, imag_acc,
                         local_real, local_imag, (i - 1)*items*groups, fft_bitlength, out));
             });
             queue.wait_and_throw();
