@@ -18,3 +18,5 @@ first number non-zero, same out put for each element
 
 issues:
 - stages is incorrect
+
+- phase2 has incorrect complex coeficient

@@ -134,26 +134,27 @@ public:
         //index1 means local index
         size_t sub_index = item.get_global_linear_id(); //sub index is for this
         size_t global_index = item.get_global_linear_id() + offset;
-        size_t reverse_index = bitReverse(global_index, stages);
         size_t local_range = item.get_local_range(0);
         size_t group_range = item.get_group_range(0);
         local_real[index1] = 0;
         local_imag[index1] = 0;
 
-        local_real[index1] = real[(sub_index%group_range)*local_range + sub_index/group_range + offset];
-        local_imag[index1] = imag[(sub_index%group_range)*local_range + sub_index/group_range + offset];
+        size_t origin_index = (sub_index%group_range)*local_range + sub_index/group_range + offset;
 
-        out << "this is global " << global_index << " this is original " << (sub_index%group_range)*local_range + sub_index/group_range + offset << sycl::endl;
+        local_real[index1] = real[origin_index];
+        local_imag[index1] = imag[origin_index];
+
+        out << "this is global " << global_index << " this is original " << origin_index << sycl::endl;
 
         //synchronize
         item.barrier(sycl::access::fence_space::local_space);
         //...
 
-        for (size_t i = 1; i <= phase2_stages; i++) {
+        for (size_t i = stages, j = 1; i <= phase2_stages + stages; i++, j++) {
             int interval = 1;
             interval <<= i;
 
-            int tt_f = (index1/(interval >> 1))%2;
+            int tt_f = (origin_index/(interval >> 1))%2;
 
                         
             float t_real = 0;
@@ -162,16 +163,16 @@ public:
             float fence_add_r = 0;
             float fence_add_i = 0;
 
-            int power = (index1%interval) * (fft_length/interval);
+            int power = (origin_index%interval) * (fft_length/interval);
             w_calculator(fft_length, power, t_real, t_complex);
                         
             if (tt_f == 0) {
-                complex_calculator(local_real[index1 + (interval >> 1)], local_imag[index1 + (interval >> 1)], t_real, t_complex);
+                complex_calculator(local_real[index1 + j], local_imag[index1 + j], t_real, t_complex);
             }
             else {
                 complex_calculator(local_real[index1], local_imag[index1], t_real, t_complex);
-                fence_add_r = local_real[index1 - (interval >> 1)];
-                fence_add_i = local_imag[index1 - (interval >> 1)];
+                fence_add_r = local_real[index1 - j];
+                fence_add_i = local_imag[index1 - j];
             }
                         
             //synchronize
@@ -192,8 +193,8 @@ public:
             //...
         }
 
-        real[(sub_index%group_range)*local_range + sub_index/group_range + offset] = local_real[index1];
-        imag[(sub_index%group_range)*local_range + sub_index/group_range + offset] = local_imag[index1];
+        real[origin_index] = local_real[index1];
+        imag[origin_index] = local_imag[index1];
     }
 
 
