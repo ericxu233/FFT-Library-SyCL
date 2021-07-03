@@ -148,7 +148,7 @@ public:
         //synchronize
         item.barrier(sycl::access::fence_space::local_space);
         //...
-        fft_length =
+
         for (size_t i = 1; i <= phase2_stages; i++) {
             int interval = 1;
             interval <<= i;
