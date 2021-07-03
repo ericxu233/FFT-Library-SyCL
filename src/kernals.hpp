@@ -144,7 +144,7 @@ public:
         local_real[index1] = real[origin_index];
         local_imag[index1] = imag[origin_index];
 
-        out << "this is global " << global_index << " this is original " << origin_index << sycl::endl;
+        //out << "this is global " << global_index << " this is original " << origin_index << sycl::endl;
 
         //synchronize
         item.barrier(sycl::access::fence_space::local_space);
