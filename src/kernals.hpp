@@ -143,7 +143,7 @@ public:
         local_real[index1] = real[(sub_index%group_range)*local_range + sub_index/group_range + offset];
         local_imag[index1] = imag[(sub_index%group_range)*local_range + sub_index/group_range + offset];
 
-        out << "this is global " << global_index << " this is original " << (index1%group_range)*local_range + index1/group_range + offset << sycl::endl;
+        out << "this is global " << global_index << " this is original " << (sub_index%group_range)*local_range + sub_index/group_range + offset << sycl::endl;
 
         //synchronize
         item.barrier(sycl::access::fence_space::local_space);
