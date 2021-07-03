@@ -15,8 +15,8 @@ int main() {
 
     sycl_fft_setup();
 
-    //fft_max_max(data, output_r, output_c);
-    rs_parrallel(data, output_r, output_c);
+    fft_max_max(data, output_r, output_c);
+    //rs_parrallel(data, output_r, output_c);
 
 
     //cout << "( " << output_r[0] << " , " << output_r[data.size()/2] << " )" << endl;
