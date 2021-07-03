@@ -31,6 +31,9 @@ public:
         size_t sub_index = item.get_global_linear_id(); //sub index is for this
         size_t global_index = item.get_global_linear_id() + offset;
         size_t reverse_index = bitReverse(global_index,  global_stages);
+
+        out << "REVERSE INDEX: " << reverse_index[index1] << " with ind: " << index1 << sycl::endl;
+
         local_real[index1] = 0;
         local_imag[index1] = 0;
         local_real[index1] = data[reverse_index];
