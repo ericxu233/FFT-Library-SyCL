@@ -81,7 +81,7 @@ public:
                 local_real[index1] = t_real + fence_add_r;
                 local_imag[index1] = t_complex + fence_add_i;
             }
-
+            out << local_real[index1] << " , " << local_imag[index1] << " stage "<< i << " index " << global_index << sycl::endl;
             //synchronize
             item.barrier(sycl::access::fence_space::local_space);
             //...
