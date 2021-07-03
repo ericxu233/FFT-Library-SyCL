@@ -14,3 +14,7 @@ intel xe IRIS pro
 same number
 
 first number non-zero, same out put for each element
+
+
+issues:
+- stages is incorrect

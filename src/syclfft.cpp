@@ -331,17 +331,13 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
     const size_t phase = fft_length/ (Devicespec::dim1);
     const size_t items = Devicespec::dim1;
     const size_t groups = Devicespec::work_group_size;
-    size_t tempp = Devicespec::dim1;
 
-    size_t stages = 0;
+    size_t local_stages = log2(items);
+    size_t fft_bitlength= log2(fft_length);
 
     cout << items << "  " << groups << endl;
 
-    while (tempp != 1) {
-        tempp /= 2;
-        stages++; 
-    }
-
+    
     tempp = groups;
     size_t phase2_stages = 0;
 
@@ -349,6 +345,8 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
         tempp /= 2;
         phase2_stages++; 
     }
+
+
 
     real.resize(data.size());
     imag.resize(data.size());
@@ -385,7 +383,7 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
             
                 cgh.parallel_for(sycl::nd_range<1>(groups*items, items), 
                         group_reduction(fft_length, stages, read_data, real_acc, imag_acc,
-                        local_real, local_imag, (i - 1)*items*groups, phase2_stages, out));
+                        local_real, local_imag, (i - 1)*items*groups, fft_bitlength, out));
             });
             queue.wait_and_throw();
             /*
@@ -409,7 +407,7 @@ void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) 
                 auto imag_acc = buff_imag.get_access<sycl::access::mode::read_write>(cgh);
             
                 cgh.parallel_for(sycl::nd_range<1>(groups*items, items), 
-                        phase2_reduction(fft_length, stages, read_data, real_acc, imag_acc,
+                        phase2_reduction(fft_length, local_stages, read_data, real_acc, imag_acc,
                         local_real, local_imag, (i - 1)*items*groups, phase2_stages, out));
             });
             queue.wait_and_throw();

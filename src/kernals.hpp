@@ -22,7 +22,7 @@ public:
     group_reduction(size_t length, size_t stagesR, read_acc dataR, rrww_acc realR, 
     rrww_acc imagR, rewr_acc local_realR, rewr_acc local_imagR, size_t offset, size_t phase2_stages, sycl::stream out):
     fft_length(length), stages(stagesR), data(dataR), real(realR), imag(imagR),
-    local_real(local_realR), local_imag(local_imagR), offset(offset), phase2_stages(phase2_stages), out(out)
+    local_real(local_realR), local_imag(local_imagR), offset(offset), global_stages(phase2_stages), out(out)
     {}
 
     void operator()(sycl::nd_item<1> item) const{
@@ -30,7 +30,7 @@ public:
         //index1 means local index
         size_t sub_index = item.get_global_linear_id(); //sub index is for this
         size_t global_index = item.get_global_linear_id() + offset;
-        size_t reverse_index = bitReverse(global_index, stages);
+        size_t reverse_index = bitReverse(global_index,  global_stages);
         local_real[index1] = 0;
         local_imag[index1] = 0;
         local_real[index1] = data[reverse_index];
@@ -99,7 +99,7 @@ private:
     rewr_acc local_real;
     rewr_acc local_imag;
     size_t offset;
-    size_t phase2_stages;
+    size_t global_stages;
     sycl::stream out;
 };
 
