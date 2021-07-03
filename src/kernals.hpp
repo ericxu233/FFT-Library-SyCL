@@ -140,8 +140,8 @@ public:
         local_real[index1] = 0;
         local_imag[index1] = 0;
 
-        local_real[index1] = real[(index1%group_range)*local_range + index1/group_range + offset];
-        local_imag[index1] = imag[(index1%group_range)*local_range + index1/group_range + offset];
+        local_real[index1] = real[(sub_index%group_range)*local_range + sub_index/group_range + offset];
+        local_imag[index1] = imag[(sub_index%group_range)*local_range + sub_index/group_range + offset];
 
         out << "this is global " << global_index << " this is original " << (index1%group_range)*local_range + index1/group_range + offset << sycl::endl;
 
