@@ -38,7 +38,7 @@ public:
         local_imag[index1] = 0;
         local_real[index1] = data[reverse_index];
 
-        out << local_real[index1] << " with ind: " << global_index << sycl::endl;
+        //out << local_real[index1] << " with ind: " << global_index << sycl::endl;
 
         //synchronize
         item.barrier(sycl::access::fence_space::local_space);
@@ -81,7 +81,7 @@ public:
                 local_real[index1] = t_real + fence_add_r;
                 local_imag[index1] = t_complex + fence_add_i;
             }
-            out << local_real[index1] << " , " << local_imag[index1] << " stage "<< i << " index " << global_index << sycl::endl;
+            //out << local_real[index1] << " , " << local_imag[index1] << " stage "<< i << " index " << global_index << sycl::endl;
             //synchronize
             item.barrier(sycl::access::fence_space::local_space);
             //...
@@ -142,6 +142,8 @@ public:
 
         local_real[index1] = real[(index1%group_range)*local_range + index1/group_range + offset];
         local_imag[index1] = imag[(index1%group_range)*local_range + index1/group_range + offset];
+
+        out << "this is global " << global_index << " this is original " << (index1%group_range)*local_range + index1/group_range + offset << sycl::endl;
 
         //synchronize
         item.barrier(sycl::access::fence_space::local_space);
