@@ -325,7 +325,7 @@ void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& ima
 void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& imag) {
 
     //only for testing
-    test(8, 2);
+    //test(8, 2);
 
     const size_t fft_length = data.size();
     const size_t phase = fft_length/ (Devicespec::dim1);
