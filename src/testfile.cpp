@@ -6,9 +6,7 @@ int main() {
     vector<float> output_r;
     vector<float> output_c;
 
-    for (int i = 0; i < data.size(); i++) {
-        cout << data[i] << endl;
-    }
+
     //vector<float> data(1024*8, 0);
     
     //for (int i = 0; i < data.size(); i++) {
