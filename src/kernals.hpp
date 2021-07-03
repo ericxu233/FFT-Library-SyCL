@@ -38,7 +38,7 @@ public:
         local_imag[index1] = 0;
         local_real[index1] = data[reverse_index];
 
-        //out << local_real[index1] << " with ind: " << index1 << sycl::endl;
+        out << local_real[index1] << " with ind: " << index1 << sycl::endl;
 
         //synchronize
         item.barrier(sycl::access::fence_space::local_space);
