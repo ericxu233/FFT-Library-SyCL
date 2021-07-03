@@ -148,7 +148,7 @@ public:
         //synchronize
         item.barrier(sycl::access::fence_space::local_space);
         //...
-
+        fft_length =
         for (size_t i = 1; i <= phase2_stages; i++) {
             int interval = 1;
             interval <<= i;
@@ -192,8 +192,8 @@ public:
             //...
         }
 
-        real[(index1%group_range)*local_range + index1/group_range + offset] = local_real[index1];
-        imag[(index1%group_range)*local_range + index1/group_range + offset] = local_imag[index1];
+        real[(sub_index%group_range)*local_range + sub_index/group_range + offset] = local_real[index1];
+        imag[(sub_index%group_range)*local_range + sub_index/group_range + offset] = local_imag[index1];
     }
 
 
