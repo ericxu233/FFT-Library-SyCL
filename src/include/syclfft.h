@@ -19,6 +19,7 @@ void rs_sequencial(vector<float>& data, vector<float>& real, vector<float>& comp
 //
 void fft_group_size(vector<float>& data, vector<float>& real, vector<float>& complex);
 void fft_max_max(vector<float>& data, vector<float>& real, vector<float>& complex);
+void fft_max(vector<float>& data, vector<float>& real, vector<float>& complex);
 
 //
 void fft_optimized_parallel(vector<float>& data, vector<float>& real, vector<float>& complex);

@@ -20,3 +20,21 @@ issues:
 - stages is incorrect
 
 - phase2 has incorrect complex coeficient
+
+
+report:
+
+limitations:
+
+- cannot utilize full hardware potential if number of work-groups is not a power of 2
+
+GPU memory index        data index          work group index
+
+0                       0                   0
+1                       4                   1
+2                       1                   2
+3                       5                   3
+4                       2                   0
+5                       6                   1
+6                       3                   2
+7                       7                   3
